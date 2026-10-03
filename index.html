@@ -1,0 +1,1134 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Patrimônio — inventário por etiqueta</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  color-scheme:light;
+  --bg:#F2F4F8; --surface:#FFFFFF; --surface-2:#F5F7FB; --ink:#0F1A2E; --muted:#5B667B; --line:#DDE2EB;
+  --tag:#FFC93C; --tag-ink:#2A2000; --accent:#2D5BE3; --accent-ink:#FFFFFF;
+  --ok:#12714F; --ok-bg:#DAF1E6; --warn:#8A5200; --warn-bg:#FCEBCB; --info:#2D5BE3; --info-bg:#E1E9FC;
+  --mute:#4B566B; --mute-bg:#E5E8EE; --bad:#B3261E; --bad-bg:#FBE3E1;
+  --display:'Bricolage Grotesque','Figtree',system-ui,sans-serif;
+  --font:'Figtree',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;
+  --ph-bg-l:92%; --ph-fg-l:30%; --ph-s:62%;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --bg:#0B101B; --surface:#141C2B; --surface-2:#1A2436; --ink:#E9EDF5; --muted:#97A3B8; --line:#26324A;
+    --accent:#7C9DF5; --accent-ink:#0B1226;
+    --ok:#5CCB9B; --ok-bg:#113125; --warn:#F0B45C; --warn-bg:#382809; --info:#8DB0F8; --info-bg:#172746;
+    --mute:#B3BDCE; --mute-bg:#222D42; --bad:#FF8A80; --bad-bg:#40191A;
+    --ph-bg-l:22%; --ph-fg-l:78%; --ph-s:38%;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#0B101B; --surface:#141C2B; --surface-2:#1A2436; --ink:#E9EDF5; --muted:#97A3B8; --line:#26324A;
+  --accent:#7C9DF5; --accent-ink:#0B1226;
+  --ok:#5CCB9B; --ok-bg:#113125; --warn:#F0B45C; --warn-bg:#382809; --info:#8DB0F8; --info-bg:#172746;
+  --mute:#B3BDCE; --mute-bg:#222D42; --bad:#FF8A80; --bad-bg:#40191A;
+  --ph-bg-l:22%; --ph-fg-l:78%; --ph-s:38%;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.45;-webkit-text-size-adjust:100%}
+h1,h2,h3,p{margin:0}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+fieldset{border:0;padding:0;margin:0;min-width:0}
+fieldset:disabled{opacity:.65}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+svg{flex:none}
+
+.page{max-width:1180px;margin:0 auto;padding:0 18px 110px}
+
+/* barra superior */
+.bar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0}
+.brand{display:flex;align-items:center;gap:10px;font-family:var(--display);font-weight:700;font-size:1.35rem;letter-spacing:-.01em}
+.mark{width:34px;height:34px;border-radius:10px;background:var(--tag);color:var(--tag-ink);display:grid;place-items:center}
+.bar-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.who{display:flex;align-items:center;gap:8px;padding:4px 12px 4px 4px;border-radius:99px;background:var(--surface);border:1px solid var(--line)}
+.who img{width:30px;height:30px;border-radius:50%;object-fit:cover;background:var(--surface-2)}
+.who b{display:block;font-size:.86rem;line-height:1.1;font-weight:600}
+.who small{display:block;font-size:.75rem;color:var(--muted);line-height:1.1;margin-top:2px}
+@media (max-width:520px){.who div{display:none}.who{padding:4px}}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 16px;font-weight:600;color:var(--ink)}
+.btn:hover{background:var(--surface-2)}
+.btn:disabled{cursor:default;opacity:.6}
+.btn.primary{background:var(--accent);color:var(--accent-ink);border-color:transparent}
+.btn.primary:hover{filter:brightness(1.07)}
+.btn.danger{color:var(--bad);border-color:transparent;background:var(--bad-bg)}
+.btn.small{padding:7px 12px;font-size:.9rem;border-radius:10px}
+.icon-btn{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;color:var(--ink)}
+.icon-btn:hover{background:var(--surface-2)}
+
+.banner{background:var(--warn-bg);color:var(--warn);border-radius:14px;padding:12px 16px;margin-bottom:14px;font-weight:500}
+.legacy{display:flex;flex-wrap:wrap;gap:10px 14px;align-items:center;justify-content:space-between;background:var(--info-bg);border-radius:14px;padding:12px 16px;margin-bottom:14px}
+
+/* busca e cadastro em um só campo */
+.finder{margin:6px 0 22px}
+.plate{position:relative;display:flex;align-items:center;gap:10px;background:var(--tag);color:var(--tag-ink);border-radius:22px;padding:10px 12px 10px 58px;min-height:70px}
+.plate::before{content:"";position:absolute;left:22px;top:50%;width:18px;height:18px;margin-top:-9px;border-radius:50%;background:var(--bg);box-shadow:inset 0 2px 4px rgba(0,0,0,.35)}
+.plate:focus-within{outline:3px solid var(--accent);outline-offset:3px}
+.plate input{flex:1;min-width:0;width:100%;background:transparent;border:0;padding:8px 0;font-family:var(--mono);font-weight:700;font-size:clamp(1.05rem,2.8vw,1.55rem);letter-spacing:.01em;color:var(--tag-ink)}
+.plate input:focus{outline:none}
+.plate input::placeholder{color:rgba(42,32,0,.5);font-weight:500}
+.plate .pbtn{flex:none;width:46px;height:46px;border-radius:50%;border:0;background:var(--tag-ink);color:var(--tag);display:grid;place-items:center}
+.plate .pbtn.ghost{background:transparent;color:var(--tag-ink);width:38px;height:38px}
+.plate .pbtn.ghost:hover{background:rgba(42,32,0,.12)}
+.finder-hint{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;min-height:38px;margin:10px 6px 0;color:var(--muted);font-size:.93rem}
+.plate.mini{padding:8px 10px 8px 46px;min-height:0;border-radius:14px}
+.plate.mini::before{left:16px;width:14px;height:14px;margin-top:-7px;background:var(--surface)}
+.plate.mini:focus-within{outline-offset:2px}
+.plate.mini label{display:block;font-size:.8rem;font-weight:700}
+.plate.mini input{font-size:1.25rem;padding:2px 0}
+
+/* resumo e filtros */
+.summary{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 28px;margin-bottom:14px}
+.summary div{display:flex;align-items:baseline;gap:8px;color:var(--muted)}
+.summary b{font-family:var(--display);font-size:1.7rem;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
+.seg{display:flex;gap:2px;padding:4px;background:var(--surface);border:1px solid var(--line);border-radius:14px;max-width:100%;overflow-x:auto}
+.seg button{border:0;background:none;border-radius:10px;padding:7px 12px;font-weight:600;color:var(--muted);white-space:nowrap}
+.seg button .n{font-weight:500;opacity:.75;margin-left:5px}
+.seg button.on{background:var(--ink);color:var(--surface)}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sel{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-weight:500;max-width:200px}
+.toggle{display:flex;padding:3px;gap:2px;background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.toggle button{width:36px;height:34px;border:0;border-radius:9px;background:none;color:var(--muted);display:grid;place-items:center}
+.toggle button[aria-pressed="true"]{background:var(--surface-2);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.count{font-size:.88rem;color:var(--muted);margin:0 2px 10px}
+
+/* itens */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(212px,1fr));gap:16px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.card:hover{border-color:var(--accent)}
+.card .open{display:block;width:100%;padding:0;border:0;background:none;text-align:left;color:inherit}
+.media{--h:210;position:relative;aspect-ratio:4/3;display:grid;place-items:center;overflow:hidden;background:hsl(var(--h) var(--ph-s) var(--ph-bg-l));color:hsl(var(--h) calc(var(--ph-s) - 10%) var(--ph-fg-l))}
+.media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.media .letter{font-family:var(--display);font-weight:700;font-size:3rem;line-height:1}
+.sticker{position:absolute;left:10px;top:10px;max-width:calc(100% - 20px);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono);font-weight:700;font-size:.8rem;background:var(--tag);color:var(--tag-ink);padding:3px 10px 3px 21px;border-radius:7px;transform:rotate(-1.2deg);box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.sticker::before{content:"";position:absolute;left:7px;top:50%;width:7px;height:7px;margin-top:-3.5px;border-radius:50%;background:rgba(42,32,0,.55)}
+.cbody{display:block;padding:12px 14px 4px}
+.code-inline{display:none;font-family:var(--mono);font-weight:700;font-size:.8rem;background:var(--tag);color:var(--tag-ink);padding:1px 8px;border-radius:5px;margin-bottom:3px;width:max-content;max-width:100%}
+.nm{display:block;font-weight:650;line-height:1.25;overflow-wrap:anywhere}
+.nm.empty{font-weight:500;font-style:italic;color:var(--muted)}
+.meta{display:block;color:var(--muted);font-size:.87rem;margin-top:2px;overflow-wrap:anywhere}
+.aside{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px 14px}
+.val{font-weight:600;font-size:.9rem}
+.badge{display:inline-flex;align-items:center;font-size:.76rem;font-weight:700;padding:3px 10px;border-radius:99px;white-space:nowrap}
+.badge::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;margin-right:6px}
+.s-uso{background:var(--ok-bg);color:var(--ok)}
+.s-estoque{background:var(--info-bg);color:var(--info)}
+.s-manut{background:var(--warn-bg);color:var(--warn)}
+.s-baixado{background:var(--mute-bg);color:var(--mute)}
+
+.cards.rows{grid-template-columns:1fr;gap:0;background:var(--surface);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.rows .card{border:0;border-bottom:1px solid var(--line);border-radius:0}
+.rows .card:last-child{border-bottom:0}
+.rows .card:hover{background:var(--surface-2)}
+.rows .open{display:flex;align-items:center;gap:14px;padding:10px 14px}
+.rows .media{width:58px;aspect-ratio:1;border-radius:12px;flex:none}
+.rows .media .letter{font-size:1.6rem}
+.rows .sticker{display:none}
+.rows .cbody{flex:1;min-width:0;padding:0}
+.rows .code-inline{display:block}
+.rows .aside{flex-direction:column;align-items:flex-end;padding:0;gap:4px}
+
+.empty-state{grid-column:1/-1;text-align:center;padding:54px 16px;color:var(--muted)}
+.empty-state .big{width:64px;height:64px;border-radius:18px;background:var(--tag);color:var(--tag-ink);display:grid;place-items:center;margin:0 auto 16px;transform:rotate(-4deg)}
+.empty-state strong{display:block;font-family:var(--display);font-size:1.25rem;color:var(--ink);margin-bottom:6px}
+.empty-state .actions{justify-content:center;margin-top:16px}
+.rows .empty-state{padding:44px 16px}
+
+.fab{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:20;box-shadow:0 8px 24px rgba(15,26,46,.35);border-radius:18px;padding:14px 20px}
+@media (min-width:720px){.fab{display:none}}
+@media (max-width:719px){#btnNew{display:none}}
+
+/* painel lateral de cadastro */
+dialog{color:var(--ink)}
+dialog.sheet{margin:0;padding:0;border:0;max-width:none;max-height:none;background:var(--surface);box-shadow:0 0 60px rgba(8,14,26,.45)}
+dialog::backdrop{background:rgba(8,14,26,.55)}
+@media (min-width:720px){
+  dialog.sheet{position:fixed;inset:0 0 0 auto;width:min(500px,100%);height:100%;border-radius:22px 0 0 22px}
+  dialog.sheet[open]{animation:slideIn .24s ease-out}
+}
+@media (max-width:719px){
+  dialog.sheet{position:fixed;inset:auto 0 0 0;width:100%;height:94%;border-radius:22px 22px 0 0}
+  dialog.sheet[open]{animation:rise .24s ease-out}
+}
+@keyframes slideIn{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+@keyframes rise{from{transform:translateY(40px);opacity:0}to{transform:none;opacity:1}}
+.sheet-form{display:flex;flex-direction:column;height:100%}
+.sheet-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:18px 20px 12px}
+.sheet-head h2{font-family:var(--display);font-size:1.4rem;font-weight:700;letter-spacing:-.01em}
+.sheet-body{flex:1;overflow:auto;padding:4px 20px 20px}
+.sheet-foot{border-top:1px solid var(--line);padding:12px 20px calc(14px + env(safe-area-inset-bottom,0px));background:var(--surface)}
+.foot-actions{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.foot-actions .grow{flex:1}
+.keep{display:flex;gap:8px;align-items:center;font-size:.9rem;margin-bottom:10px;color:var(--muted)}
+.keep input{width:18px;height:18px;accent-color:var(--accent)}
+.notice{font-size:.92rem;background:var(--mute-bg);color:var(--mute);border-radius:12px;padding:10px 12px;margin-bottom:14px}
+.audit{font-size:.84rem;color:var(--muted);margin-top:14px}
+
+.photo{margin-bottom:16px}
+.pv{aspect-ratio:16/9;border-radius:16px;background:var(--surface-2);border:1.5px dashed var(--line);display:grid;place-items:center;overflow:hidden;color:var(--muted);text-align:center}
+.pv img{width:100%;height:100%;object-fit:cover}
+.pv span{display:grid;gap:6px;justify-items:center;font-size:.9rem}
+.photo-actions{display:flex;gap:8px;margin-top:10px}
+.codehint{min-height:1.4em;margin:6px 2px 16px;font-size:.88rem;font-weight:500;color:var(--muted)}
+.codehint.dup{color:var(--bad)}
+.codehint .link{margin-left:6px;background:none;border:0;padding:0;color:var(--accent);font-weight:700;text-decoration:underline}
+
+.group{margin-top:20px}
+.group h3{font-family:var(--display);font-size:1.02rem;font-weight:650;margin-bottom:10px}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px}
+.field>label{font-size:.86rem;font-weight:600}
+.field input,.field select,.field textarea{width:100%;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:11px 12px}
+.field textarea{min-height:76px;resize:vertical}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:420px){.two{grid-template-columns:1fr}}
+
+/* demais diálogos */
+dialog.box{border:1px solid var(--line);border-radius:20px;background:var(--surface);padding:0;width:calc(100% - 24px);max-width:640px;max-height:calc(100% - 24px)}
+.dlg{padding:20px}
+.dlg h2{font-family:var(--display);font-size:1.25rem;font-weight:700;margin-bottom:6px}
+.dlg h3{font-family:var(--display);font-size:1rem;font-weight:650;margin:20px 0 4px}
+.dlg p{margin:0 0 8px;color:var(--muted);font-size:.93rem}
+.dlg textarea{width:100%;min-height:110px;background:var(--surface-2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-family:var(--mono);font-size:.8rem;resize:vertical}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.dlg .actions{justify-content:flex-end}
+.dlg .inline{display:flex;gap:8px;align-items:center;font-size:.92rem;margin:4px 0 8px}
+video{width:100%;border-radius:14px;background:#000;max-height:60vh}
+
+.gate{max-width:480px;margin:14vh auto 0;padding:0 20px}
+.gate .plate{padding-left:58px;min-height:64px}
+.gate .plate span{font-family:var(--mono);font-weight:700;font-size:1.25rem}
+.gate h1{font-family:var(--display);font-size:1.9rem;font-weight:700;margin:22px 0 8px;letter-spacing:-.01em}
+.gate p{color:var(--muted)}
+.gate .actions{margin-top:16px}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(86px + env(safe-area-inset-bottom,0px));background:var(--ink);color:var(--surface);padding:11px 18px;border-radius:14px;font-weight:600;max-width:calc(100% - 32px);z-index:60;box-shadow:0 10px 30px rgba(0,0,0,.3)}
+@media (min-width:720px){.toast{bottom:calc(24px + env(safe-area-inset-bottom,0px))}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+
+<section class="gate" id="gate" aria-live="polite">
+  <div class="plate"><span id="gateTag">Conectando…</span></div>
+  <h1 id="gateTitle">Abrindo o inventário</h1>
+  <p id="gateText">Aguarde um instante.</p>
+  <div class="actions" id="gateActions" hidden><button class="btn primary" type="button" id="gateRetry">Tentar de novo</button></div>
+</section>
+
+<div class="page" id="app" hidden>
+  <header class="bar">
+    <h1 class="brand">
+      <span class="mark" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12.5V4a1 1 0 0 1 1-1h8.5a1 1 0 0 1 .7.3l7.5 7.5a1 1 0 0 1 0 1.4l-8.5 8.5a1 1 0 0 1-1.4 0l-7.5-7.5a1 1 0 0 1-.3-.7Z"/><circle cx="8" cy="8" r="1.4"/></svg></span>
+      Patrimônio
+    </h1>
+    <div class="bar-right">
+      <div class="who"><img id="whoImg" alt="" width="30" height="30"><div><b id="whoName">Você</b><small id="whoRole"></small></div></div>
+      <button class="btn" id="btnData" type="button">Dados</button>
+      <button class="btn primary" id="btnNew" type="button">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Novo item
+      </button>
+    </div>
+  </header>
+
+  <div id="banner" class="banner" hidden></div>
+  <div id="legacy" class="legacy" hidden>
+    <span id="legacyText"></span>
+    <button class="btn primary small" type="button" id="legacyGo">Enviar para o inventário</button>
+  </div>
+
+  <section class="finder" aria-label="Buscar ou cadastrar por código">
+    <div class="plate">
+      <input id="finder" type="text" inputmode="text" enterkeyhint="go" placeholder="Escaneie ou digite o código da etiqueta" spellcheck="false" autocomplete="off" aria-label="Código da etiqueta ou texto de busca">
+      <button type="button" class="pbtn ghost" id="finderClear" aria-label="Limpar busca" hidden>
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+      <button type="button" class="pbtn" id="btnScan" aria-label="Escanear código com a câmera" hidden>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M7 12h10"/></svg>
+      </button>
+    </div>
+    <div class="finder-hint" id="finderHint" aria-live="polite"></div>
+  </section>
+
+  <div class="summary">
+    <div><b id="tCount">0</b> itens</div>
+    <div><b id="tValue">R$ 0,00</b> em valor registrado</div>
+  </div>
+
+  <div class="toolbar">
+    <div class="seg" id="chips" role="group" aria-label="Filtrar por situação"></div>
+    <div class="tools">
+      <select class="sel" id="fcat" aria-label="Filtrar por categoria"></select>
+      <select class="sel" id="floc" aria-label="Filtrar por local"></select>
+      <select class="sel" id="sort" aria-label="Ordenar por">
+        <option value="recent">Mais recentes</option>
+        <option value="code">Código</option>
+        <option value="name">Nome</option>
+      </select>
+      <div class="toggle" role="group" aria-label="Modo de exibição">
+        <button type="button" id="viewGrid" aria-label="Ver em cartões" aria-pressed="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg></button>
+        <button type="button" id="viewRows" aria-label="Ver em lista" aria-pressed="false"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3.5 6h.01M3.5 12h.01M3.5 18h.01"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="count" id="countLine"></div>
+  <div class="cards" id="list"></div>
+</div>
+
+<button class="btn primary fab" id="fab" type="button" hidden>
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Novo item
+</button>
+
+<dialog id="drawer" class="sheet" aria-labelledby="formTitle">
+  <form id="form" class="sheet-form" autocomplete="off">
+    <header class="sheet-head">
+      <h2 id="formTitle">Novo item</h2>
+      <button type="button" class="icon-btn" id="drawerClose" aria-label="Fechar">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18"/></svg>
+      </button>
+    </header>
+    <div class="sheet-body">
+      <div class="notice" id="roNotice" hidden>Seu acesso é somente leitura. Peça a quem administra a página o nível Colaborador para cadastrar e editar itens.</div>
+      <fieldset id="formSet">
+        <div class="photo">
+          <div class="pv" id="pv"></div>
+          <div class="photo-actions">
+            <label class="btn small" for="photo" id="photoLbl">Adicionar foto</label>
+            <input id="photo" type="file" accept="image/*" hidden>
+            <button type="button" class="btn small" id="photoRemove" hidden>Remover foto</button>
+          </div>
+        </div>
+
+        <div class="plate mini">
+          <label for="code">Código da etiqueta</label>
+          <input id="code" type="text" inputmode="text" enterkeyhint="next" placeholder="Código" spellcheck="false" autocapitalize="characters">
+        </div>
+        <div class="codehint" id="codeHint" aria-live="polite"></div>
+
+        <div class="field"><label for="name">Nome do item</label><input id="name" type="text" placeholder="Ex.: Notebook Dell Latitude 5420"></div>
+
+        <div class="group">
+          <h3>Onde está</h3>
+          <div class="two">
+            <div class="field"><label for="category">Categoria</label><input id="category" type="text" list="dlCat" placeholder="Ex.: Informática"></div>
+            <div class="field"><label for="location">Local</label><input id="location" type="text" list="dlLoc" placeholder="Ex.: Sala 3"></div>
+          </div>
+          <div class="field"><label for="responsible">Responsável</label><input id="responsible" type="text" list="dlResp"></div>
+        </div>
+
+        <div class="group">
+          <h3>Situação do item</h3>
+          <div class="two">
+            <div class="field"><label for="status">Situação</label>
+              <select id="status"><option>Em uso</option><option>Em estoque</option><option>Em manutenção</option><option>Baixado</option></select></div>
+            <div class="field"><label for="condition">Conservação</label>
+              <select id="condition"><option>Novo</option><option selected>Bom</option><option>Regular</option><option>Ruim</option><option>Inservível</option></select></div>
+          </div>
+        </div>
+
+        <div class="group">
+          <h3>Detalhes</h3>
+          <div class="two">
+            <div class="field"><label for="value">Valor (R$)</label><input id="value" type="text" inputmode="decimal" placeholder="0,00"></div>
+            <div class="field"><label for="acquired">Data de aquisição</label><input id="acquired" type="date"></div>
+          </div>
+          <div class="field"><label for="serial">Nº de série</label><input id="serial" type="text"></div>
+          <div class="field"><label for="notes">Observações</label><textarea id="notes"></textarea></div>
+        </div>
+      </fieldset>
+      <div class="audit" id="audit"></div>
+    </div>
+    <footer class="sheet-foot">
+      <label class="keep" id="keepWrap"><input type="checkbox" id="keep" checked> Manter categoria, local e responsável no próximo cadastro</label>
+      <div class="foot-actions">
+        <button type="button" class="btn danger" id="btnDelete" hidden>Excluir</button>
+        <span class="grow"></span>
+        <button type="button" class="btn" id="btnClear">Cancelar</button>
+        <button type="submit" class="btn primary" id="btnSave">Salvar item</button>
+      </div>
+    </footer>
+  </form>
+</dialog>
+<datalist id="dlCat"></datalist><datalist id="dlLoc"></datalist><datalist id="dlResp"></datalist>
+
+<dialog id="delDlg" class="box"><div class="dlg">
+  <h2>Excluir este item?</h2>
+  <p id="delText"></p>
+  <div class="actions"><button class="btn" id="delNo" type="button">Cancelar</button><button class="btn danger" id="delYes" type="button">Excluir</button></div>
+</div></dialog>
+
+<dialog id="scanDlg" class="box"><div class="dlg">
+  <h2>Escanear etiqueta</h2>
+  <p id="scanMsg">Aponte a câmera para o código da etiqueta.</p>
+  <video id="scanVideo" playsinline muted></video>
+  <div class="actions"><button class="btn" id="scanClose" type="button">Fechar</button></div>
+</div></dialog>
+
+<dialog id="dataDlg" class="box"><div class="dlg">
+  <h2>Dados</h2>
+  <h3>Copiar para planilha</h3>
+  <p>Cole direto no Excel ou Google Planilhas.</p>
+  <textarea id="tsvOut" readonly></textarea>
+  <div class="actions"><button class="btn small" id="copyTsv" type="button">Copiar</button></div>
+
+  <h3>Backup completo</h3>
+  <p>Guarde este texto em um arquivo seguro. Para restaurar, cole em “Importar”.</p>
+  <label class="inline"><input type="checkbox" id="withPhotos" checked> Incluir fotos</label>
+  <textarea id="jsonOut" readonly></textarea>
+  <div class="actions"><button class="btn small" id="copyJson" type="button">Copiar backup</button></div>
+
+  <div id="importBox">
+    <h3>Importar</h3>
+    <p>Cole uma lista de códigos (um por linha), linhas copiadas de uma planilha com cabeçalho (Código, Nome, Categoria, Local, Responsável, Situação, Conservação, Valor, Data de aquisição, Nº de série, Observações) ou um backup. Códigos que já existem são atualizados.</p>
+    <textarea id="importTxt" placeholder="Cole aqui"></textarea>
+    <div class="actions"><button class="btn primary" id="doImport" type="button">Importar</button></div>
+  </div>
+  <div class="actions"><button class="btn" id="dataClose" type="button">Fechar</button></div>
+</div></dialog>
+
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script>
+(function(){
+'use strict';
+var LEGACY_KEY='patrimonio.inventario.v1';
+var VIEW_KEY='patrimonio.visao';
+var STATUS=['Em uso','Em estoque','Em manutenção','Baixado'];
+var COND=['Novo','Bom','Regular','Ruim','Inservível'];
+var FIELDS=[['code','Código'],['name','Nome'],['category','Categoria'],['location','Local'],['responsible','Responsável'],['status','Situação'],['condition','Conservação'],['value','Valor'],['acquired','Data de aquisição'],['serial','Nº de série'],['notes','Observações']];
+var ALIAS={
+  code:['codigo','cod','etiqueta','tombo','patrimonio','codigo da etiqueta','n patrimonio','numero'],
+  name:['nome','descricao','item','produto','objeto'],
+  category:['categoria','tipo','grupo'],
+  location:['local','localizacao','setor','sala'],
+  responsible:['responsavel','resp'],
+  status:['situacao','status'],
+  condition:['conservacao','estado'],
+  value:['valor','preco','valor r$'],
+  acquired:['data de aquisicao','aquisicao','data'],
+  serial:['n de serie','numero de serie','serie','n serie'],
+  notes:['observacoes','observacao','obs','notas']
+};
+
+var items=[], editing=null, photoData='', activeStatus='Todos', viewMode='grid', carry=null;
+var col=null, userNs=null, me=null, meId=null, canWrite=true, isEditor=false, ready=false, busy=false;
+var $=function(id){return document.getElementById(id);};
+var f={};['code','name','category','location','responsible','status','condition','value','acquired','serial','notes'].forEach(function(k){f[k]=$(k);});
+var finder=$('finder');
+
+/* ---------- utilidades ---------- */
+function key(c){return String(c==null?'':c).trim().toLowerCase();}
+function plain(s){return String(s==null?'':s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+function headNorm(s){return plain(s).replace(/[^a-z0-9$\s]/g,' ').replace(/\s+/g,' ').trim();}
+function money(n){return new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(n||0);}
+function parseValue(s){
+  var t=String(s==null?'':s).trim().replace(/[R$\s]/g,'');
+  if(!t) return null;
+  var n=Number(t.indexOf(',')>-1?t.replace(/\./g,'').replace(',','.'):t);
+  return isFinite(n)?n:null;
+}
+function pickFrom(list,v,def){
+  var p=plain(v).trim();
+  for(var i=0;i<list.length;i++){ if(plain(list[i])===p) return list[i]; }
+  return def;
+}
+function normDate(v){
+  var s=String(v||'').trim();
+  if(/^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+  var m=s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+  if(m) return m[3]+'-'+('0'+m[2]).slice(-2)+'-'+('0'+m[1]).slice(-2);
+  return '';
+}
+function hueOf(s){ var h=0; s=String(s||''); for(var i=0;i<s.length;i++){ h=(h*31+s.charCodeAt(i))%360; } return h; }
+function sleep(ms){return new Promise(function(r){setTimeout(r,ms);});}
+function findByCode(c){return items.filter(function(i){return key(i.code)===key(c);})[0];}
+var toastTimer=null;
+function toast(msg){
+  var t=$('toast'); t.textContent=msg; t.hidden=false;
+  clearTimeout(toastTimer); toastTimer=setTimeout(function(){t.hidden=true;},3600);
+}
+function showBanner(msg){ var b=$('banner'); b.textContent=msg||''; b.hidden=!msg; }
+
+/* O código vira o id do documento: letras minúsculas, números e hífen; o resto é codificado. */
+function docIdFor(code){
+  var k=key(code), out='';
+  for(var i=0;i<k.length;i++){
+    var ch=k[i];
+    if(/[a-z0-9-]/.test(ch)) out+=ch;
+    else out+='~'+k.charCodeAt(i).toString(16)+'~';
+  }
+  return out;
+}
+
+/* ---------- banco compartilhado ---------- */
+function errCode(e){return (e&&e.code)||'unavailable';}
+function withRetry(fn,tries){
+  var left=tries||2;
+  function attempt(){
+    return fn().catch(function(e){
+      var c=errCode(e);
+      if(left>0 && (c==='unavailable'||c==='resource_exhausted')){
+        left--; return sleep(c==='resource_exhausted'?1500:300+Math.random()*500).then(attempt);
+      }
+      throw e;
+    });
+  }
+  return attempt();
+}
+function writeError(e){
+  var c=errCode(e);
+  if(c==='invalid_argument'||c==='transform_error'){
+    setReadOnly(true);
+    toast('Sem permissão para alterar o inventário. Peça o nível Colaborador.');
+  } else if(c==='quota_exceeded'){ toast('Limite de armazenamento do inventário atingido. Exclua itens ou fotos.'); }
+  else if(c==='resource_exhausted'){ toast('Muitas operações seguidas. Aguarde alguns segundos.'); }
+  else if(c==='revoked'){ setReadOnly(true); toast('Seu acesso a esta página mudou.'); }
+  else { toast('Não foi possível salvar. Tente de novo.'); }
+}
+function setReadOnly(ro){
+  canWrite=!ro;
+  $('formSet').disabled=ro;
+  $('roNotice').hidden=!ro;
+  $('importBox').hidden=ro;
+  $('btnNew').hidden=ro; $('fab').hidden=ro;
+  $('btnSave').hidden=ro; $('keepWrap').hidden=ro;
+  $('btnClear').textContent=ro?'Fechar':'Cancelar';
+  renderRole(); renderFinderHint(); renderList(); checkLegacy();
+}
+function renderRole(){
+  $('whoRole').textContent=isEditor?'Editor':(canWrite?'Colaborador':'Somente leitura');
+}
+function buildDoc(src,old){
+  var now=new Date().toISOString();
+  return {
+    code:src.code, name:src.name||'',
+    category:src.category||'', location:src.location||'', responsible:src.responsible||'',
+    status:src.status||'Em uso', condition:src.condition||'Bom',
+    value:(src.value==null||src.value==='')?null:Number(src.value),
+    acquired:src.acquired||'', serial:src.serial||'', notes:src.notes||'', photo:src.photo||'',
+    createdAt:(old&&old.createdAt)||now, createdBy:(old&&old.createdBy)||meId||null,
+    updatedAt:now, updatedBy:meId||null
+  };
+}
+function putItem(doc){ return withRetry(function(){return col.doc(docIdFor(doc.code)).set(doc);},4); }
+
+/* ---------- painel de cadastro ---------- */
+var CAM='<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8h3l1.6-2.4h6.8L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1Z"/><circle cx="12" cy="13" r="3.5"/></svg>';
+function setMode(){
+  $('formTitle').textContent=!canWrite?'Detalhes do item':(editing?'Editar item':'Novo item');
+  $('btnSave').textContent=editing?'Salvar alterações':'Salvar item';
+  $('btnDelete').hidden=!(editing&&isEditor&&canWrite);
+}
+function renderPhoto(){
+  var pv=$('pv');
+  if(photoData){ pv.innerHTML=''; var img=document.createElement('img'); img.alt='Foto do item'; img.src=photoData; pv.appendChild(img); }
+  else pv.innerHTML='<span>'+CAM+'Sem foto ainda</span>';
+  $('photoRemove').hidden=!photoData;
+  $('photoLbl').textContent=photoData?'Trocar foto':'Adicionar foto';
+}
+function renderAudit(it){
+  var el=$('audit'); el.textContent='';
+  if(!it||!userNs) return;
+  var ids=[it.createdBy,it.updatedBy].filter(Boolean);
+  if(!ids.length) return;
+  userNs.profiles(ids).then(function(ps){
+    if(!editing||key(it.code)!==key(editing)) return;
+    var who=function(id){ return id&&ps[id]?(ps[id].isMe?'você':(ps[id].name||'outra pessoa')):'—'; };
+    var fmt=function(s){ try{return new Date(s).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'});}catch(e){return '';} };
+    el.textContent='Cadastrado por '+who(it.createdBy)+(it.createdAt?' em '+fmt(it.createdAt):'')+'. Última alteração por '+who(it.updatedBy)+(it.updatedAt?' em '+fmt(it.updatedAt):'')+'.';
+  });
+}
+function clearForm(){
+  Object.keys(f).forEach(function(k){f[k].value='';});
+  f.status.value='Em uso'; f.condition.value='Bom';
+  editing=null; photoData='';
+  $('audit').textContent='';
+  renderPhoto(); setMode(); hint();
+}
+function showDrawer(focusEl){
+  var d=$('drawer');
+  if(!d.open) d.showModal();
+  setTimeout(function(){ (canWrite&&focusEl?focusEl:$('drawerClose')).focus(); },40);
+}
+function openItem(it){
+  clearForm();
+  editing=it.code;
+  Object.keys(f).forEach(function(k){
+    if(k==='value') f[k].value=(it.value!=null&&it.value!=='')?String(it.value).replace('.',','):'';
+    else f[k].value=it[k]||'';
+  });
+  if(!f.status.value) f.status.value='Em uso';
+  if(!f.condition.value) f.condition.value='Bom';
+  photoData=it.photo||'';
+  renderPhoto(); setMode(); hint(); renderAudit(it);
+  showDrawer(f.name);
+}
+function openNew(code){
+  if(!canWrite){ toast('Seu acesso é somente leitura.'); return; }
+  clearForm();
+  if($('keep').checked && carry){
+    f.category.value=carry.category; f.location.value=carry.location; f.responsible.value=carry.responsible; f.status.value=carry.status||'Em uso';
+  }
+  f.code.value=code||'';
+  setMode(); hint();
+  showDrawer(code?f.name:f.code);
+}
+function hint(){
+  var c=f.code.value.trim(), h=$('codeHint');
+  h.className='codehint'; h.textContent='';
+  if(!c){ h.textContent='Digite ou escaneie o código impresso na etiqueta.'; return; }
+  var ex=findByCode(c);
+  if(ex && key(ex.code)!==key(editing)){
+    h.className='codehint dup';
+    h.appendChild(document.createTextNode('Código já cadastrado: '+(ex.name||'sem nome')+'.'));
+    var b=document.createElement('button'); b.type='button'; b.className='link'; b.textContent='Abrir cadastro';
+    b.addEventListener('click',function(){openItem(ex);});
+    h.appendChild(b);
+  } else if(ex){ h.textContent='Editando este item.'; }
+  else { h.textContent='Código novo.'; }
+}
+function saveItem(){
+  if(busy||!col) return;
+  if(!canWrite){ toast('Seu acesso é somente leitura.'); return; }
+  var code=f.code.value.trim(), name=f.name.value.trim();
+  if(!code){ toast('Informe o código da etiqueta.'); f.code.focus(); return; }
+  if(!name){ toast('Informe o nome do item.'); f.name.focus(); return; }
+  var id=docIdFor(code);
+  if(id.length>190){ toast('Esse código é longo demais.'); return; }
+  var dup=findByCode(code);
+  if(dup && key(dup.code)!==key(editing)){ toast('Esse código já está cadastrado. Abra o cadastro para editar.'); hint(); return; }
+  var old=editing?findByCode(editing):null;
+  var doc=buildDoc({
+    code:code, name:name, category:f.category.value.trim(), location:f.location.value.trim(), responsible:f.responsible.value.trim(),
+    status:f.status.value, condition:f.condition.value, value:parseValue(f.value.value), acquired:f.acquired.value,
+    serial:f.serial.value.trim(), notes:f.notes.value.trim(), photo:photoData
+  },old);
+  busy=true; $('btnSave').disabled=true;
+  var check=editing?Promise.resolve(false):withRetry(function(){return col.doc(id).get();}).then(function(s){return s.exists;});
+  check.then(function(exists){
+    if(exists){ throw {code:'__dup'}; }
+    return putItem(doc);
+  }).then(function(){
+    if(editing && key(editing)!==key(code)){
+      return withRetry(function(){return col.doc(docIdFor(editing)).delete();});
+    }
+  }).then(function(){
+    carry={category:doc.category,location:doc.location,responsible:doc.responsible,status:doc.status};
+    toast('Item '+code+' salvo.');
+    $('drawer').close();
+    finder.value=''; renderFinderHint(); renderList();
+    finder.focus();
+  }).catch(function(e){
+    if(e&&e.code==='__dup'){ toast('Esse código acabou de ser cadastrado por outra pessoa.'); hint(); }
+    else writeError(e);
+  }).then(function(){ busy=false; $('btnSave').disabled=false; });
+}
+
+/* ---------- foto ---------- */
+function shrink(file){
+  return new Promise(function(res,rej){
+    var r=new FileReader();
+    r.onerror=function(){rej();};
+    r.onload=function(){
+      var img=new Image();
+      img.onerror=function(){rej();};
+      img.onload=function(){
+        function enc(max,q){
+          var s=Math.min(1,max/Math.max(img.width,img.height));
+          var c=document.createElement('canvas');
+          c.width=Math.max(1,Math.round(img.width*s)); c.height=Math.max(1,Math.round(img.height*s));
+          c.getContext('2d').drawImage(img,0,0,c.width,c.height);
+          return c.toDataURL('image/jpeg',q);
+        }
+        var out=enc(520,0.72);
+        if(out.length>150000) out=enc(400,0.58);
+        res(out);
+      };
+      img.src=r.result;
+    };
+    r.readAsDataURL(file);
+  });
+}
+
+/* ---------- busca e lista ---------- */
+function uniq(k){
+  var set={}; items.forEach(function(i){ if(i[k]) set[i[k]]=1; });
+  return Object.keys(set).sort(function(a,b){return a.localeCompare(b,'pt-BR');});
+}
+function fillSelect(sel,vals,label){
+  var cur=sel.value; sel.innerHTML='';
+  sel.add(new Option(label,''));
+  vals.forEach(function(v){sel.add(new Option(v,v));});
+  sel.value=vals.indexOf(cur)>-1?cur:'';
+}
+function fillDatalist(dl,vals){
+  dl.innerHTML='';
+  vals.forEach(function(v){var o=document.createElement('option');o.value=v;dl.appendChild(o);});
+}
+function refreshLists(){
+  fillSelect($('fcat'),uniq('category'),'Todas as categorias');
+  fillSelect($('floc'),uniq('location'),'Todos os locais');
+  fillDatalist($('dlCat'),uniq('category'));
+  fillDatalist($('dlLoc'),uniq('location'));
+  fillDatalist($('dlResp'),uniq('responsible'));
+  renderFinderHint(); renderList();
+}
+function haystack(i){return plain([i.code,i.name,i.category,i.location,i.responsible,i.serial,i.notes].join(' '));}
+function searchRows(q){
+  var t=plain(q).trim();
+  return items.filter(function(i){return !t||haystack(i).indexOf(t)>-1;});
+}
+function filteredRows(){
+  var cat=$('fcat').value, loc=$('floc').value, sort=$('sort').value;
+  var rows=searchRows(finder.value).filter(function(i){
+    if(activeStatus==='Incompletos'){ if(i.name) return false; }
+    else if(activeStatus!=='Todos' && i.status!==activeStatus) return false;
+    if(cat && i.category!==cat) return false;
+    if(loc && i.location!==loc) return false;
+    return true;
+  });
+  rows.sort(function(a,b){
+    if(sort==='code') return String(a.code).localeCompare(String(b.code),'pt-BR',{numeric:true});
+    if(sort==='name') return String(a.name||'').localeCompare(String(b.name||''),'pt-BR');
+    return String(b.updatedAt||'').localeCompare(String(a.updatedAt||''));
+  });
+  return rows;
+}
+function statusClass(s){
+  return s==='Em uso'?'s-uso':s==='Em estoque'?'s-estoque':s==='Em manutenção'?'s-manut':'s-baixado';
+}
+function renderChips(){
+  var wrap=$('chips'); wrap.innerHTML='';
+  var inc=items.filter(function(i){return !i.name;}).length;
+  if(activeStatus==='Incompletos' && !inc) activeStatus='Todos';
+  var opts=['Todos'].concat(STATUS); if(inc) opts.push('Incompletos');
+  opts.forEach(function(s){
+    var n=s==='Todos'?items.length:s==='Incompletos'?inc:items.filter(function(i){return i.status===s;}).length;
+    var b=document.createElement('button'); b.type='button';
+    b.className=s===activeStatus?'on':''; b.setAttribute('aria-pressed',s===activeStatus?'true':'false');
+    b.appendChild(document.createTextNode(s));
+    var sp=document.createElement('span'); sp.className='n'; sp.textContent=n; b.appendChild(sp);
+    b.addEventListener('click',function(){activeStatus=s;renderList();});
+    wrap.appendChild(b);
+  });
+}
+function cardEl(it){
+  var art=document.createElement('article'); art.className='card';
+  var open=document.createElement('button'); open.type='button'; open.className='open';
+  open.addEventListener('click',function(){openItem(it);});
+
+  var media=document.createElement('span'); media.className='media';
+  media.style.setProperty('--h',hueOf(it.category||it.name||it.code));
+  if(it.photo){ var im=document.createElement('img'); im.alt=''; im.loading='lazy'; im.src=it.photo; media.appendChild(im); }
+  else { var lt=document.createElement('span'); lt.className='letter'; lt.textContent=((it.name||it.code||'?').trim().charAt(0)||'?').toUpperCase(); media.appendChild(lt); }
+  var st=document.createElement('span'); st.className='sticker'; st.textContent=it.code; media.appendChild(st);
+  open.appendChild(media);
+
+  var body=document.createElement('span'); body.className='cbody';
+  var ci=document.createElement('span'); ci.className='code-inline'; ci.textContent=it.code; body.appendChild(ci);
+  var nm=document.createElement('span'); nm.className='nm'+(it.name?'':' empty'); nm.textContent=it.name||'Sem descrição, toque para completar'; body.appendChild(nm);
+  var mt=[it.location,it.category].filter(Boolean).join(', ');
+  if(mt){ var meta=document.createElement('span'); meta.className='meta'; meta.textContent=mt; body.appendChild(meta); }
+  open.appendChild(body);
+
+  var aside=document.createElement('span'); aside.className='aside';
+  var bd=document.createElement('span'); bd.className='badge '+statusClass(it.status); bd.textContent=it.status||'Em uso'; aside.appendChild(bd);
+  if(it.value!=null&&it.value!==''){ var v=document.createElement('span'); v.className='val'; v.textContent=money(it.value); aside.appendChild(v); }
+  open.appendChild(aside);
+
+  art.appendChild(open);
+  return art;
+}
+var BIGTAG='<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12.5V4a1 1 0 0 1 1-1h8.5a1 1 0 0 1 .7.3l7.5 7.5a1 1 0 0 1 0 1.4l-8.5 8.5a1 1 0 0 1-1.4 0l-7.5-7.5a1 1 0 0 1-.3-.7Z"/><circle cx="8" cy="8" r="1.4"/></svg>';
+function emptyEl(title,text,withActions){
+  var d=document.createElement('div'); d.className='empty-state';
+  var big=document.createElement('div'); big.className='big'; big.innerHTML=BIGTAG; d.appendChild(big);
+  var s=document.createElement('strong'); s.textContent=title; d.appendChild(s);
+  var p=document.createElement('div'); p.textContent=text; d.appendChild(p);
+  if(withActions&&canWrite){
+    var a=document.createElement('div'); a.className='actions';
+    var b1=document.createElement('button'); b1.type='button'; b1.className='btn primary'; b1.textContent='Cadastrar primeiro item'; b1.addEventListener('click',function(){openNew('');});
+    var b2=document.createElement('button'); b2.type='button'; b2.className='btn'; b2.textContent='Importar lista de códigos'; b2.addEventListener('click',openData);
+    a.appendChild(b1); a.appendChild(b2); d.appendChild(a);
+  }
+  return d;
+}
+function renderList(){
+  renderChips();
+  var rows=filteredRows();
+  var list=$('list'); list.innerHTML='';
+  list.className='cards'+(viewMode==='rows'?' rows':'');
+  if(!ready){ list.appendChild(emptyEl('Carregando o inventário…','Só um instante.',false)); }
+  else if(!items.length){ list.appendChild(emptyEl('Nenhum item cadastrado ainda','Escaneie ou digite o código de uma etiqueta no campo amarelo para começar.',true)); }
+  else if(!rows.length){ list.appendChild(emptyEl('Nada encontrado','Ajuste a busca ou os filtros.',false)); }
+  else rows.forEach(function(it){list.appendChild(cardEl(it));});
+  $('countLine').textContent=(items.length&&rows.length)?('Mostrando '+rows.length+' de '+items.length+' itens'):'';
+  $('tCount').textContent=items.length;
+  $('tValue').textContent=money(items.reduce(function(s,i){return s+(Number(i.value)||0);},0));
+}
+function setView(m){
+  viewMode=m;
+  $('viewGrid').setAttribute('aria-pressed',m==='grid'?'true':'false');
+  $('viewRows').setAttribute('aria-pressed',m==='rows'?'true':'false');
+  try{ localStorage.setItem(VIEW_KEY,m); }catch(e){}
+  renderList();
+}
+
+/* campo único: busca, abre ou cadastra */
+function renderFinderHint(){
+  var h=$('finderHint'), q=finder.value.trim();
+  h.innerHTML=''; $('finderClear').hidden=!q;
+  var span=document.createElement('span');
+  if(!q){
+    span.textContent=canWrite?'Código novo abre o cadastro. Código existente abre o item.':'Digite um código ou nome para buscar.';
+    h.appendChild(span); return;
+  }
+  var ex=findByCode(q);
+  if(ex){ span.textContent='Encontrado: '+(ex.name||'item sem descrição')+'. Pressione Enter para abrir.'; h.appendChild(span); return; }
+  var n=searchRows(q).length;
+  span.textContent=n?(n+(n===1?' item encontrado.':' itens encontrados.')):'Nenhum item com esse texto.';
+  h.appendChild(span);
+  if(canWrite){
+    var b=document.createElement('button'); b.type='button'; b.className='btn primary small';
+    b.textContent='Cadastrar “'+q+'” como novo item';
+    b.addEventListener('click',function(){openNew(q);});
+    h.appendChild(b);
+  }
+}
+function handleFinderEnter(){
+  var q=finder.value.trim(); if(!q) return;
+  var ex=findByCode(q);
+  if(ex){ openItem(ex); return; }
+  var m=searchRows(q);
+  if(m.length===1){ openItem(m[0]); return; }
+  if(m.length===0){ if(canWrite) openNew(q); else toast('Nenhum item com esse código.'); return; }
+  toast(m.length+' itens encontrados. Escolha um da lista.');
+}
+
+/* ---------- exclusão (só Editor) ---------- */
+var toDelete=null;
+function askDelete(it){
+  toDelete=it;
+  $('delText').textContent='O item '+it.code+(it.name?' ('+it.name+')':'')+' será removido para todas as pessoas que usam esta página. Essa ação não pode ser desfeita.';
+  $('delDlg').showModal();
+}
+
+/* ---------- câmera ---------- */
+var stream=null, scanTimer=null;
+function stopStream(){
+  clearTimeout(scanTimer); scanTimer=null;
+  if(stream){ stream.getTracks().forEach(function(t){t.stop();}); stream=null; }
+  $('scanVideo').srcObject=null;
+}
+function openScan(){
+  var dlg=$('scanDlg');
+  $('scanMsg').textContent='Aponte a câmera para o código da etiqueta.';
+  dlg.showModal();
+  var det;
+  try{ det=new BarcodeDetector(); }catch(e){ $('scanMsg').textContent='Este navegador não lê códigos pela câmera. Digite o código.'; return; }
+  navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}).then(function(s){
+    stream=s;
+    var v=$('scanVideo'); v.srcObject=s;
+    return v.play().then(function(){
+      (function tick(){
+        if(!stream) return;
+        det.detect(v).then(function(r){
+          if(r&&r.length){ var val=r[0].rawValue; dlg.close(); finder.value=val; renderFinderHint(); renderList(); handleFinderEnter(); }
+          else scanTimer=setTimeout(tick,250);
+        }).catch(function(){ scanTimer=setTimeout(tick,400); });
+      })();
+    });
+  }).catch(function(){
+    $('scanMsg').textContent='Não foi possível usar a câmera. Verifique a permissão do navegador ou digite o código.';
+  });
+}
+
+/* ---------- dados: exportar / importar ---------- */
+function toTSV(){
+  var head=FIELDS.map(function(x){return x[1];}).join('\t');
+  var lines=items.slice().sort(function(a,b){return String(a.code).localeCompare(String(b.code),'pt-BR',{numeric:true});}).map(function(it){
+    return FIELDS.map(function(x){
+      var v=it[x[0]]; if(v==null) v='';
+      if(x[0]==='value'&&v!=='') v=String(v).replace('.',',');
+      return String(v).replace(/[\t\r\n]+/g,' ');
+    }).join('\t');
+  });
+  return [head].concat(lines).join('\n');
+}
+function toJSONText(){
+  var withPh=$('withPhotos').checked;
+  return JSON.stringify(items.map(function(it){
+    var c={}; Object.keys(it).forEach(function(k){ if(k!=='createdBy'&&k!=='updatedBy') c[k]=it[k]; });
+    if(!withPh) delete c.photo;
+    return c;
+  }));
+}
+function openData(){
+  $('tsvOut').value=toTSV(); $('jsonOut').value=toJSONText(); $('importTxt').value='';
+  $('importBox').hidden=!canWrite;
+  $('dataDlg').showModal();
+}
+function copyText(ta){
+  var done=function(){toast('Copiado.');};
+  var fallback=function(){
+    ta.focus(); ta.select();
+    var ok=false; try{ ok=document.execCommand('copy'); }catch(e){}
+    if(ok) done(); else toast('Selecione o texto e copie com Ctrl+C.');
+  };
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(ta.value).then(done,fallback); }
+  else fallback();
+}
+function parseTable(text){
+  var first=text.split(/\r?\n/)[0];
+  var d=first.indexOf('\t')>-1?'\t':(first.indexOf(';')>-1?';':',');
+  var rows=[],row=[],cur='',q=false;
+  for(var i=0;i<text.length;i++){
+    var ch=text[i];
+    if(q){
+      if(ch==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; }
+      else cur+=ch;
+    } else if(ch==='"'&&cur===''){ q=true; }
+    else if(ch===d){ row.push(cur); cur=''; }
+    else if(ch==='\n'){ row.push(cur); rows.push(row); row=[]; cur=''; }
+    else if(ch==='\r'){}
+    else cur+=ch;
+  }
+  row.push(cur); rows.push(row);
+  return rows.filter(function(r){return r.some(function(c){return c.trim()!=='';});});
+}
+function cleanItem(o){
+  return {
+    code:String(o.code==null?'':o.code).trim(),
+    name:String(o.name==null?'':o.name).trim(),
+    category:String(o.category||'').trim(), location:String(o.location||'').trim(), responsible:String(o.responsible||'').trim(),
+    status:pickFrom(STATUS,o.status,'Em uso'), condition:pickFrom(COND,o.condition,'Bom'),
+    value:(typeof o.value==='number')?o.value:parseValue(o.value),
+    acquired:normDate(o.acquired), serial:String(o.serial||'').trim(), notes:String(o.notes||'').trim(),
+    photo:typeof o.photo==='string'?o.photo:'',
+    createdAt:typeof o.createdAt==='string'?o.createdAt:''
+  };
+}
+function fromJSON(txt){
+  var data=JSON.parse(txt);
+  if(data&&!Array.isArray(data)&&Array.isArray(data.items)) data=data.items;
+  if(!Array.isArray(data)) throw new Error('Backup não reconhecido.');
+  return data.map(cleanItem);
+}
+function fromTable(txt){
+  var rows=parseTable(txt);
+  if(!rows.length) throw new Error('Nenhuma linha encontrada.');
+  var head=rows[0].map(headNorm), map={}, body;
+  head.forEach(function(h,i){
+    Object.keys(ALIAS).forEach(function(k){ if(map[k]===undefined && ALIAS[k].indexOf(h)>-1) map[k]=i; });
+  });
+  if(map.code===undefined){
+    if(rows[0].length===1){ map.code=0; body=rows; }
+    else throw new Error('Não encontrei a coluna “Código” no cabeçalho.');
+  } else body=rows.slice(1);
+  return body.map(function(r){
+    var o={}; Object.keys(map).forEach(function(k){o[k]=r[map[k]]==null?'':r[map[k]];});
+    return cleanItem(o);
+  });
+}
+async function writeMany(list,label){
+  var added=0, updated=0, skipped=0, i=0;
+  for(i=0;i<list.length;i++){
+    var n=list[i];
+    if(!n.code||docIdFor(n.code).length>190){ skipped++; continue; }
+    var ex=findByCode(n.code), doc;
+    if(ex){
+      var merged={}; Object.keys(ex).forEach(function(k){merged[k]=ex[k];});
+      Object.keys(n).forEach(function(k){
+        if(k==='code'||k==='createdAt') return;
+        if(n[k]!==''&&n[k]!=null) merged[k]=n[k];
+      });
+      doc=buildDoc(merged,ex); updated++;
+    } else {
+      doc=buildDoc(n,null); if(n.createdAt) doc.createdAt=n.createdAt; added++;
+    }
+    if(label&&i%10===0) toast(label+' '+(i+1)+' de '+list.length+'…');
+    try{ await putItem(doc); }
+    catch(e){ writeError(e); return {added:added,updated:updated,skipped:skipped,failed:true}; }
+    await sleep(40);
+  }
+  return {added:added,updated:updated,skipped:skipped,failed:false};
+}
+async function doImport(){
+  if(busy||!canWrite) return;
+  var txt=$('importTxt').value.trim();
+  if(!txt){ toast('Cole os dados primeiro.'); return; }
+  var list;
+  try{ list=(txt[0]==='['||txt[0]==='{')?fromJSON(txt):fromTable(txt); }
+  catch(e){ toast(e.message||'Formato não reconhecido.'); return; }
+  busy=true; $('doImport').disabled=true;
+  var r=await writeMany(list,'Importando');
+  busy=false; $('doImport').disabled=false;
+  if(!r.failed){
+    $('dataDlg').close();
+    toast(r.added+' novos, '+r.updated+' atualizados'+(r.skipped?', '+r.skipped+' ignorados':'')+'.');
+  }
+}
+
+/* ---------- dados da versão anterior (salvos só no navegador) ---------- */
+function legacyItems(){
+  try{
+    if(localStorage.getItem(LEGACY_KEY+'.migrated')) return [];
+    var r=localStorage.getItem(LEGACY_KEY); if(!r) return [];
+    var a=JSON.parse(r); return Array.isArray(a)?a:[];
+  }catch(e){ return []; }
+}
+function checkLegacy(){
+  var l=legacyItems();
+  if(ready && canWrite && l.length){
+    $('legacyText').textContent='Há '+l.length+' itens salvos só neste navegador pela versão anterior. Enviar para o inventário compartilhado?';
+    $('legacy').hidden=false;
+  } else $('legacy').hidden=true;
+}
+async function migrateLegacy(){
+  if(busy) return;
+  var l=legacyItems().map(cleanItem).filter(function(o){return o.code&&!findByCode(o.code);});
+  busy=true; $('legacyGo').disabled=true;
+  var r=await writeMany(l,'Enviando');
+  busy=false; $('legacyGo').disabled=false;
+  if(!r.failed){
+    try{ localStorage.setItem(LEGACY_KEY+'.migrated','1'); }catch(e){}
+    $('legacy').hidden=true;
+    toast(r.added+' itens enviados.');
+  }
+}
+
+/* ---------- eventos ---------- */
+function bind(){
+  finder.addEventListener('input',function(){renderFinderHint();renderList();});
+  finder.addEventListener('keydown',function(e){ if(e.key==='Enter'){ e.preventDefault(); handleFinderEnter(); } });
+  $('finderClear').addEventListener('click',function(){ finder.value=''; renderFinderHint(); renderList(); finder.focus(); });
+  $('btnNew').addEventListener('click',function(){openNew('');});
+  $('fab').addEventListener('click',function(){openNew('');});
+
+  $('form').addEventListener('submit',function(e){e.preventDefault();saveItem();});
+  f.code.addEventListener('input',hint);
+  f.code.addEventListener('keydown',function(e){
+    if(e.key==='Enter'){
+      e.preventDefault();
+      var c=f.code.value.trim(), ex=c?findByCode(c):null;
+      if(ex && key(ex.code)!==key(editing)){ openItem(ex); toast('Item já cadastrado aberto para edição.'); }
+      else f.name.focus();
+    }
+  });
+  $('drawerClose').addEventListener('click',function(){$('drawer').close();});
+  $('btnClear').addEventListener('click',function(){$('drawer').close();});
+  $('drawer').addEventListener('close',clearForm);
+  $('btnDelete').addEventListener('click',function(){ var it=editing?findByCode(editing):null; if(it) askDelete(it); });
+
+  $('photo').addEventListener('change',function(e){
+    var file=e.target.files&&e.target.files[0]; if(!file) return;
+    shrink(file).then(function(d){photoData=d;renderPhoto();},function(){toast('Não foi possível ler a imagem.');});
+    e.target.value='';
+  });
+  $('photoRemove').addEventListener('click',function(){photoData='';renderPhoto();});
+
+  ['fcat','floc','sort'].forEach(function(id){$(id).addEventListener('change',renderList);});
+  $('viewGrid').addEventListener('click',function(){setView('grid');});
+  $('viewRows').addEventListener('click',function(){setView('rows');});
+
+  $('delNo').addEventListener('click',function(){$('delDlg').close();});
+  $('delYes').addEventListener('click',function(){
+    var it=toDelete; toDelete=null; $('delDlg').close();
+    if(!it||!col) return;
+    withRetry(function(){return col.doc(docIdFor(it.code)).delete();}).then(function(){
+      $('drawer').close();
+      toast('Item '+it.code+' excluído.');
+    }).catch(writeError);
+  });
+
+  if('BarcodeDetector' in window && navigator.mediaDevices && navigator.mediaDevices.getUserMedia){
+    $('btnScan').hidden=false;
+    $('btnScan').addEventListener('click',openScan);
+  }
+  $('scanClose').addEventListener('click',function(){$('scanDlg').close();});
+  $('scanDlg').addEventListener('close',stopStream);
+
+  $('btnData').addEventListener('click',openData);
+  $('dataClose').addEventListener('click',function(){$('dataDlg').close();});
+  $('copyTsv').addEventListener('click',function(){copyText($('tsvOut'));});
+  $('copyJson').addEventListener('click',function(){copyText($('jsonOut'));});
+  $('withPhotos').addEventListener('change',function(){$('jsonOut').value=toJSONText();});
+  $('doImport').addEventListener('click',doImport);
+  $('legacyGo').addEventListener('click',migrateLegacy);
+  $('gateRetry').addEventListener('click',function(){location.reload();});
+}
+
+/* ---------- acesso e início ---------- */
+function showGate(tag,title,text,retry){
+  $('app').hidden=true; $('gate').hidden=false;
+  $('gateTag').textContent=tag; $('gateTitle').textContent=title; $('gateText').textContent=text;
+  $('gateActions').hidden=!retry;
+}
+async function start(){
+  bind();
+  try{ var v=localStorage.getItem(VIEW_KEY); if(v==='rows') viewMode='rows'; }catch(e){}
+  $('viewGrid').setAttribute('aria-pressed',viewMode==='grid'?'true':'false');
+  $('viewRows').setAttribute('aria-pressed',viewMode==='rows'?'true':'false');
+  renderPhoto(); setMode();
+  if(!window.claude||typeof window.claude.use!=='function'){
+    showGate('Acesso restrito','Entre para ver o inventário','Abra esta página pelo link compartilhado, já conectado à sua conta.',true); return;
+  }
+  var dbNs=null;
+  try{ dbNs=await window.claude.use('db'); }catch(e){ dbNs=null; }
+  try{ userNs=await window.claude.use('user'); }catch(e){ userNs=null; }
+  if(!dbNs){
+    showGate('Acesso restrito','Entre para ver o inventário','O inventário só abre para quem está conectado com uma conta que recebeu acesso. Entre na sua conta e abra o link de novo. Se já entrou, peça acesso a quem administra a página.',true);
+    return;
+  }
+  col=dbNs.collection('items');
+  if(userNs){
+    try{
+      me=await userNs.me(); meId=me.id||null;
+      isEditor=await userNs.canEdit();
+      var cw=await userNs.can('data.write');
+      canWrite=(cw!==false);
+    }catch(e){}
+  }
+  $('whoName').textContent=(me&&me.name)||'Você';
+  if(me&&me.avatarUrl) $('whoImg').src=me.avatarUrl;
+  $('gate').hidden=true; $('app').hidden=false;
+  setReadOnly(!canWrite);
+  renderFinderHint(); renderList();
+
+  col.onSnapshot(function(snap){
+    items=snap.docs.map(function(d){return d.data();}).filter(Boolean);
+    ready=true; showBanner('');
+    refreshLists(); hint(); checkLegacy();
+  },function(err){
+    var c=errCode(err);
+    if(c==='revoked') showBanner('Seu acesso a esta página mudou. Recarregue para continuar.');
+    else showBanner('A conexão com o inventário foi interrompida. Recarregue a página.');
+    ready=true; renderList();
+  });
+  if(window.matchMedia && window.matchMedia('(pointer:fine)').matches){ finder.focus(); }
+}
+if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',start); else start();
+})();
+</script>
+</body>
+</html>
